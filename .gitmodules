@@ -1,0 +1,3 @@
+[submodule "dailyfeed-batch"]
+	path = dailyfeed-batch
+	url = https://github.com/alpha3002025/dailyfeed-batch
