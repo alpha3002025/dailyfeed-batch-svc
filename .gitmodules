@@ -13,3 +13,6 @@
 [submodule "dailyfeed-kafka-support"]
 	path = dailyfeed-kafka-support
 	url = https://github.com/alpha3002025/dailyfeed-kafka-support
+[submodule "dailyfeed-deadletter-support"]
+	path = dailyfeed-deadletter-support
+	url = https://github.com/alpha3002025/dailyfeed-deadletter-support
