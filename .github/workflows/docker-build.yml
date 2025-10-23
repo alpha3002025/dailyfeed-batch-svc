@@ -5,17 +5,17 @@ on:
     branches:
       - main
       - develop
-      - env/v1/ci-cd/github-workflow-jib-docker-build-20251023
+      - hotfix
   workflow_dispatch:
     inputs:
       image_version:
-        description: 'Docker image version (e.g., beta-20251023-0001)'
+        description: 'Docker image version (e.g., {branch name}-20251023-0001)'
         required: true
         type: string
 
 env:
-  # 기본 이미지 버전 (자동 생성: beta-YYYYMMDD-HHMM)
-  DEFAULT_IMAGE_VERSION: beta-${{ github.run_number }}
+  # 기본 이미지 버전 (자동 생성)
+  DEFAULT_IMAGE_VERSION: ${{ github.ref_name }}-${{ github.run_number }}
 
 jobs:
   build-and-push:
@@ -46,7 +46,7 @@ jobs:
             echo "IMAGE_VERSION=${{ inputs.image_version }}" >> $GITHUB_ENV
           else
             # 자동 빌드 시 날짜 기반 버전 생성
-            IMAGE_VERSION="beta-$(date +'%Y%m%d-%H%M')"
+            IMAGE_VERSION="${{ github.ref_name }}-$(date +'%Y%m%d-%H%M')"
             echo "IMAGE_VERSION=${IMAGE_VERSION}" >> $GITHUB_ENV
           fi
           echo "Selected image version: ${IMAGE_VERSION}"
@@ -72,59 +72,59 @@ jobs:
           echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
 
-      - name: Install Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: 'latest'
-
-      - name: Clone Helm Repository
-        # HELM_REPO_TOKEN : 추후 Github APP 방식으로 전환 예정 (Github APP 방식은 TOKEN 이 별도로 필요없음)
-        run: |
-          git clone https://x-access-token:${{ secrets.HELM_REPO_TOKEN }}@github.com/alpha3002025/dailyfeed-app-helm /tmp/dailyfeed-app-helm
-          echo "Helm repository cloned successfully"
-
-      - name: Package Helm Chart
-        run: |
-          cd /tmp/dailyfeed-app-helm/base-chart/dailyfeed-backend-chart
-          helm package .
-          echo "Helm chart packaged successfully"
-
-      - name: Copy Helm Package to Batch Directory
-        run: |
-          cp /tmp/dailyfeed-app-helm/base-chart/dailyfeed-backend-chart/dailyfeed-backend-chart-*.tgz \
-             /tmp/dailyfeed-app-helm/batch/
-          echo "Helm package copied to batch directory"
-
-      - name: Update install-helm-local.sh Script
-        run: |
-          cat > /tmp/dailyfeed-app-helm/batch/install-helm-local.sh << 'EOF'
-          #!/bin/bash
-
-          # Usage: ./install-helm-local.sh <IMAGE_TAG>
-          # Example: ./install-helm-local.sh beta-20251023-1234
-
-          if [ -z "$1" ]; then
-            echo "Error: IMAGE_TAG is required"
-            echo "Usage: $0 <IMAGE_TAG>"
-            echo "Example: $0 beta-20251023-1234"
-            exit 1
-          fi
-
-          IMAGE_TAG=$1
-
-          helm install -n dailyfeed dailyfeed-batch \
-            dailyfeed-backend-chart-0.1.0.tgz \
-            -f values-local-batch.yaml \
-            --set imageTag=${IMAGE_TAG}
-          EOF
-          chmod +x /tmp/dailyfeed-app-helm/batch/install-helm-local.sh
-          echo "Updated install-helm-local.sh script"
-
-      - name: Commit and Push Helm Changes
-        run: |
-          cd /tmp/dailyfeed-app-helm
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add batch/
-          git commit -m "chore: update helm chart and config for image version ${{ env.IMAGE_VERSION }}" || echo "No changes to commit"
-          git push
+#      - name: Install Helm
+#        uses: azure/setup-helm@v4
+#        with:
+#          version: 'latest'
+#
+#      - name: Clone Helm Repository
+#        # HELM_REPO_TOKEN : 추후 Github APP 방식으로 전환 예정 (Github APP 방식은 TOKEN 이 별도로 필요없음)
+#        run: |
+#          git clone https://x-access-token:${{ secrets.HELM_REPO_TOKEN }}@github.com/alpha3002025/dailyfeed-app-helm /tmp/dailyfeed-app-helm
+#          echo "Helm repository cloned successfully"
+#
+#      - name: Package Helm Chart
+#        run: |
+#          cd /tmp/dailyfeed-app-helm/base-chart/dailyfeed-backend-chart
+#          helm package .
+#          echo "Helm chart packaged successfully"
+#
+#      - name: Copy Helm Package to Batch Directory
+#        run: |
+#          cp /tmp/dailyfeed-app-helm/base-chart/dailyfeed-backend-chart/dailyfeed-backend-chart-*.tgz \
+#             /tmp/dailyfeed-app-helm/batch/
+#          echo "Helm package copied to batch directory"
+#
+#      - name: Update install-helm-local.sh Script
+#        run: |
+#          cat > /tmp/dailyfeed-app-helm/batch/install-helm-local.sh << 'EOF'
+#          #!/bin/bash
+#
+#          # Usage: ./install-helm-local.sh <IMAGE_TAG>
+#          # Example: ./install-helm-local.sh beta-20251023-1234
+#
+#          if [ -z "$1" ]; then
+#            echo "Error: IMAGE_TAG is required"
+#            echo "Usage: $0 <IMAGE_TAG>"
+#            echo "Example: $0 beta-20251023-1234"
+#            exit 1
+#          fi
+#
+#          IMAGE_TAG=$1
+#
+#          helm install -n dailyfeed dailyfeed-batch \
+#            dailyfeed-backend-chart-0.1.0.tgz \
+#            -f values-local-batch.yaml \
+#            --set imageTag=${IMAGE_TAG}
+#          EOF
+#          chmod +x /tmp/dailyfeed-app-helm/batch/install-helm-local.sh
+#          echo "Updated install-helm-local.sh script"
+#
+#      - name: Commit and Push Helm Changes
+#        run: |
+#          cd /tmp/dailyfeed-app-helm
+#          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+#          git config --local user.name "github-actions[bot]"
+#          git add batch/
+#          git commit -m "chore: update helm chart and config for image version ${{ env.IMAGE_VERSION }}" || echo "No changes to commit"
+#          git push
