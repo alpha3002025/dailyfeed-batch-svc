@@ -38,16 +38,28 @@ subprojects {
 }
 
 project(":dailyfeed-batch") {
+    // Spring Boot main class 설정
+    tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+        mainClass.set("click.dailyfeed.batch.DailyfeedBatchApplication")
+    }
+
     jib {
         // Base 이미지 설정 (Java 17 기반)
         from {
-            image = "gcr.io/distroless/java17-debian12"
+            image = "eclipse-temurin:17-jre-alpine"
         }
 
         // 타겟 이미지 설정
         to {
-            tags = setOf("beta-20251017-0001")
+            val imageVersion = System.getenv("IMAGE_VERSION") ?: "beta-20251015-0001"
+            tags = setOf(imageVersion)
             image = "alpha300uk/dailyfeed-batch-svc"
+
+            // Docker Hub 인증 (환경변수에서 가져오기)
+            auth {
+                username = System.getenv("DOCKER_USERNAME") ?: ""
+                password = System.getenv("DOCKER_PASSWORD") ?: ""
+            }
         }
 
         // Docker 실행 파일 경로 명시
@@ -57,6 +69,8 @@ project(":dailyfeed-batch") {
 
         // 컨테이너 설정
         container {
+            // Main class 명시
+            mainClass = "click.dailyfeed.batch.DailyfeedBatchApplication"
             // JVM 옵션
             jvmFlags = listOf(
                 "-XX:+UseContainerSupport",
