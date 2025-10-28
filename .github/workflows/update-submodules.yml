@@ -1,0 +1,59 @@
+name: Update Submodules
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Make git-pull-all.sh executable
+        run: chmod +x git-pull-all.sh
+
+      - name: Run git-pull-all.sh
+        run: |
+          bash git-pull-all.sh
+          echo "Submodules updated successfully"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and Push changes
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git add .
+          git commit -m "chore: update submodules via workflow"
+          git push -u origin main
+
+      - name: No changes detected
+        if: steps.changes.outputs.has_changes == 'false'
+        run: |
+          echo "No changes detected in submodules"
+
+      - name: Update Summary
+        run: |
+          echo "### Submodules Update Summary :arrows_counterclockwise:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: main" >> $GITHUB_STEP_SUMMARY
+          echo "- **Changes detected**: ${{ steps.changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
