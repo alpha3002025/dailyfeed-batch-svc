@@ -53,12 +53,12 @@ project(":dailyfeed-batch") {
         to {
             val imageVersion = System.getenv("IMAGE_VERSION") ?: "beta-20251015-0001"
             tags = setOf(imageVersion)
-            image = "alpha300uk/dailyfeed-batch-svc"
+            image = "ghcr.io/alpha3002025/dailyfeed-batch-svc"
 
-            // Docker Hub 인증 (환경변수에서 가져오기)
+            // GitHub Container Registry 인증 (환경변수에서 가져오기)
             auth {
-                username = System.getenv("DOCKER_USERNAME") ?: ""
-                password = System.getenv("DOCKER_PASSWORD") ?: ""
+                username = System.getenv("GITHUB_USERNAME") ?: ""
+                password = System.getenv("GITHUB_TOKEN") ?: ""
             }
         }
 

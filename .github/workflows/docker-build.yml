@@ -60,14 +60,14 @@ jobs:
           ./gradlew :dailyfeed-batch:jib --info
         env:
           IMAGE_VERSION: ${{ env.IMAGE_VERSION }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Summary
         run: |
           echo "### Docker Build Summary :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image**: alpha300uk/dailyfeed-batch-svc" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: ghcr.io/alpha3002025/dailyfeed-batch-svc" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ env.IMAGE_VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
