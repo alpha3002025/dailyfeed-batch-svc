@@ -20,6 +20,9 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     # GitHub Environment를 사용하는 경우 (권장)
     # environment: production
