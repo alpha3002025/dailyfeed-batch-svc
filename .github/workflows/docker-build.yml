@@ -1,11 +1,11 @@
 name: Docker Build and Push
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - hotfix
+#  push:
+#    branches:
+#      - main
+#      - develop
+#      - hotfix
   workflow_dispatch:
     inputs:
       image_version:
@@ -65,6 +65,11 @@ jobs:
           IMAGE_VERSION: ${{ env.IMAGE_VERSION }}
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MYSQL_JDBC_URL: ${{ secrets.MYSQL_JDBC_URL }}
+          MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_SCHEMA: ${{ secrets.MYSQL_SCHEMA }}
+          MONGODB_CONNECTION_URI: ${{ secrets.MONGODB_CONNECTION_URI }}
 
       - name: Build Summary
         run: |
