@@ -7,9 +7,6 @@
 [submodule "dailyfeed-redis-support"]
 	path = dailyfeed-redis-support
 	url = https://github.com/alpha3002025/dailyfeed-redis-support
-[submodule "dailyfeed-pvc-support"]
-	path = dailyfeed-pvc-support
-	url = https://github.com/alpha3002025/dailyfeed-pvc-support
 [submodule "dailyfeed-kafka-support"]
 	path = dailyfeed-kafka-support
 	url = https://github.com/alpha3002025/dailyfeed-kafka-support
