@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Token Cleanup Batch Job Runner
-# This script executes the jwtKeyInitJob batch job with specific Spring Boot configuration
+# This script executes the tokenCleanupJob batch job with specific Spring Boot configuration
 #
-# Usage: ./job-jwt-key-rotation.sh [profile]
+# Usage: ./job-token-cleanup.sh [profile]
 #   profile: Spring profile to use (local-was, local, dev)
 #   If not specified, defaults to 'local-was'
 
